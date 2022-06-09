@@ -3,16 +3,18 @@ const dateInWeek = document.querySelector("#dateInWeek"),
   month = document.querySelector("#month"),
   todoContainer = document.querySelector('.todo-container'),
   today = new Date(),
-  addButton = document.querySelector('#create')
+  addButton = document.querySelector('#create');
 
+//handle checkbox checked stage change
 const checkboxHandler = (description) => {
-    const todoItems = JSON.parse(localStorage.getItem('todo-list')) || [];
+    const todoItems = getDataFromLocalStograge();
     const findIndex = todoItems.findIndex(el => el.description === description);
     const item = {description, isDone: !todoItems[findIndex].isDone};
     todoItems.splice(findIndex, 1, item);
-    localStorage.setItem('todo-list', JSON.stringify(todoItems));
+    setDataToLocalStorage(todoItems)
 }  
 
+//create an item
 const createItemNode = ({description, isDone}) => {
     const todoItem = document.createElement('div');
     todoItem.classList.add('todo-item');
@@ -26,9 +28,9 @@ const createItemNode = ({description, isDone}) => {
     return todoItem;
 } 
 
+//get item from local storage and render to UI
 const renderItems = () => {
-    const todoItems = JSON.parse(localStorage.getItem('todo-list')) || [];
-    console.log(todoItems);
+    const todoItems = getDataFromLocalStograge();
     todoItems && todoItems.map(item => todoContainer.appendChild(createItemNode(item)))
 }
 
@@ -36,37 +38,38 @@ window.onload = () => {
     renderItems();   
 }
 
+//add new todo item
 const addNewItem = (description) => {
-    const todoItems = JSON.parse(localStorage.getItem('todo-list')) || [];
+    const todoItems = getDataFromLocalStograge();
     todoItems.push({description, isDone: false});
-    localStorage.setItem('todo-list', JSON.stringify(todoItems));
+    setDataToLocalStorage(todoItems);
     const node = createItemNode({description, isDone: false});
     todoContainer.appendChild(node);
 }
 
+//check if the item already existed or not
 const checkExisted = (description) => {
-    const todoItems = JSON.parse(localStorage.getItem('todo-list')) || [];
+    const todoItems = getDataFromLocalStograge();
     return todoItems.findIndex(el => el.description === description);
 }
 
 
-
 const dateInMonthGen = (date) => {
+    let returnDate;
     if(date === 1) {
-        return date + 'st';
+        returnDate = date + 'st';
     }
     if(date === 2) {    
-        return date + 'nd';
+        returnDate = date + 'nd';
     }
     if(date === 3) {
-        return date + 'rd';
+        returnDate = date + 'rd';
     }
-    return date + 'th';
+    else {
+        returnDate = date + 'th';
+    }
+    return returnDate;
 }
-
-dateInWeek.textContent = new Intl.DateTimeFormat('en-US', {weekday: "long"}).format(today.getDay()) + ',';
-dateInMonth.textContent = dateInMonthGen(today.getDate());
-month.textContent = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(today.getMonth());
 
 const createNewItem = () => {
     let description = prompt('Enter the description of item', "");
@@ -82,4 +85,8 @@ const createNewItem = () => {
 }
 
 addButton.addEventListener('click', createNewItem)
+
+dateInWeek.textContent = new Intl.DateTimeFormat('en-US', {weekday: "long"}).format(today.getDay()) + ',';
+dateInMonth.textContent = dateInMonthGen(today.getDate());
+month.textContent = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(today.getMonth());
 
